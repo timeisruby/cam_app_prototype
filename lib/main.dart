@@ -1,9 +1,8 @@
 import 'package:camera/camera.dart';
-import 'package:camera_app/screen/camera.dart';
 import 'package:camera_app/screen/camera_v2.dart';
 import 'package:flutter/material.dart';
 
-/*
+
 Future<void> main() async {
   // Ensure that plugin services are initialized so that `availableCameras()`
   // can be called before `runApp()`
@@ -17,28 +16,6 @@ Future<void> main() async {
 
   runApp(MaterialApp(
     title: "Camera_app",
-    home: TakePictureScreen(
-      camera: firstCamera,
-    ),
+    home: CameraScreenV2(),
   ));
-}
-*/
-
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "camera",
-      home: CameraScreenV2(),
-    );
-  }
 }
