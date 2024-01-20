@@ -9,10 +9,12 @@ class CameraScreenV2 extends StatefulWidget {
 }
 
 class _CameraScreenV2State extends State<CameraScreenV2>
-    with SingleTickerProviderStateMixin {
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   late List<CameraDescription> cameras;
   late CameraController cameraController;
   late AnimationController _flashmodeControlAnimationController;
+  late Animation<double> _flashModeControlRowAnimation;
+  late AnimationController _exposureModeControlRowAnimationController;
   bool isFlashOn = false;
   int direction = 0;
   bool isSelfieMode = false;
@@ -20,8 +22,16 @@ class _CameraScreenV2State extends State<CameraScreenV2>
   @override
   void initState() {
     _flashmodeControlAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
       vsync: this,
-      duration: Duration(milliseconds: 300),
+    );
+    _flashModeControlRowAnimation = CurvedAnimation(
+      parent: _flashmodeControlAnimationController,
+      curve: Curves.easeInCubic,
+    );
+    _exposureModeControlRowAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
     );
     startCamera(0);
     super.initState();
@@ -52,6 +62,9 @@ class _CameraScreenV2State extends State<CameraScreenV2>
   @override
   void dispose() {
     cameraController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    _flashmodeControlAnimationController.dispose();
+    _exposureModeControlRowAnimationController.dispose();
     super.dispose();
   }
 
@@ -94,19 +107,16 @@ class _CameraScreenV2State extends State<CameraScreenV2>
                       });
                     },
                   ),
-                  GestureDetector(
-                    child: button(
-                        Icons.flip_camera_ios_outlined, Alignment.bottomRight),
-                  ),
-                  if (!isSelfieMode) GestureDetector(
-                    child: button(Icons.flash_on, Alignment.bottomRight),
-                    onTap: () {
-                      _toggleFlashModeControl();
-                    },
-                  ),
+                  if (!isSelfieMode)
+                    GestureDetector(
+                      child: button(Icons.flash_on, Alignment.bottomRight),
+                      onTap: () {
+                        _toggleFlashModeControl();
+                      },
+                    ),
                 ],
               ),
-                _flashModeControlRowWidget(),
+              _flashModeControlRowWidget(),
             ],
           ),
         ),
@@ -146,10 +156,9 @@ class _CameraScreenV2State extends State<CameraScreenV2>
     );
   }
 
-
   Widget _flashModeControlRowWidget() {
     return SizeTransition(
-      sizeFactor: _flashmodeControlAnimationController,
+      sizeFactor: _flashModeControlRowAnimation,
       child: ClipRect(
         child: Container(
           color: Colors.black.withOpacity(0.5),
